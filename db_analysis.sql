@@ -7,12 +7,12 @@ SELECT st.regional_office AS teams_regional_office,
 		st.manager AS teams_manager,
         COUNT(DISTINCT st.agent_id) AS number_of_salespersons,
         COUNT(*) AS won_opportunities,
-		ROUND((SUM(s.close_value)*1e-6), 2) AS sales_revenue_in_millions     
+		SUM(s.close_value) AS sales_revenue     
 FROM sales s
 JOIN sales_teams st	ON s.agent_id = st.agent_id
 WHERE s.deal_stage = 'Won'
 GROUP BY st.regional_office, st.manager
-ORDER BY sales_revenue_in_millions DESC;
+ORDER BY sales_revenue DESC;
 
 
 # 2) Which sales teams have the highest success rate in closing deals? 
@@ -76,6 +76,33 @@ WHERE opp_rank = 1;
 
 
 # 2) What is the individual success rate of each sales agent, and how does it compare to the team average?
+WITH lost_won_deals AS (
+SELECT st.regional_office AS teams_regional_office,
+		st.manager AS teams_manager,
+        st.sales_agent,
+        SUM(CASE WHEN s.deal_stage = 'Lost' THEN 1 ELSE 0 END) AS lost_deals,
+        SUM(CASE WHEN s.deal_stage = 'Won' THEN 1 ELSE 0 END) AS won_deals
+FROM sales s
+JOIN sales_teams st ON s.agent_id = st.agent_id
+GROUP BY teams_regional_office, teams_manager, sales_agent
+),
+success_rates AS (
+SELECT teams_regional_office,
+		teams_manager,
+        sales_agent,
+        won_deals/(won_deals + lost_deals) AS agents_success_rate,
+        SUM(won_deals) OVER (sales_teams)/(SUM(won_deals) OVER (sales_teams) + SUM(lost_deals) OVER (sales_teams)) AS teams_success_rate
+FROM lost_won_deals
+WINDOW sales_teams AS (PARTITION BY teams_regional_office, teams_manager)
+)
+SELECT teams_regional_office,
+		teams_manager,
+        sales_agent,
+        ROUND(agents_success_rate*100,2) AS agents_success_rate_pct,
+        ROUND(teams_success_rate*100,2) AS teams_success_rate_pct,
+        CASE WHEN agents_success_rate > teams_success_rate THEN 'Above Team Average' ELSE 'Below Team Average' END AS success_rate_description
+FROM success_rates
+ORDER BY teams_regional_office, teams_manager, sales_agent;
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
