@@ -17,6 +17,7 @@ ORDER BY sales_revenue DESC;
 
 # 2) Which sales teams have the highest success rate in closing deals? 
 -- NOTE: The "Prospecting" and "Engaging" statuses represent intermediate phases in the sales process, so they are not included in the success rate calculation.
+-- Success rate % = (Won deals/(Won + Lost deals)) * 100
 WITH lost_won_deals AS (
 SELECT st.regional_office AS teams_regional_office,
 		st.manager AS teams_manager,
@@ -28,7 +29,7 @@ GROUP BY st.regional_office, st.manager
 )
 SELECT teams_regional_office,
 		teams_manager,
-        ROUND(((won_deals/(won_deals + lost_deals))*100), 2) AS success_rate_pct
+        ROUND((won_deals/(won_deals + lost_deals))*100, 2) AS success_rate_pct
 FROM lost_won_deals
 ORDER BY success_rate_pct DESC;
 
@@ -98,8 +99,8 @@ WINDOW sales_teams AS (PARTITION BY teams_regional_office, teams_manager)
 SELECT teams_regional_office,
 		teams_manager,
         sales_agent,
-        ROUND(agents_success_rate*100,2) AS agents_success_rate_pct,
-        ROUND(teams_success_rate*100,2) AS teams_success_rate_pct,
+        ROUND(agents_success_rate*100, 2) AS agents_success_rate_pct,
+        ROUND(teams_success_rate*100, 2) AS teams_success_rate_pct,
         CASE WHEN agents_success_rate > teams_success_rate THEN 'Above Team Average' ELSE 'Below Team Average' END AS success_rate_description
 FROM success_rates
 ORDER BY teams_regional_office, teams_manager, sales_agent;
@@ -108,7 +109,50 @@ ORDER BY teams_regional_office, teams_manager, sales_agent;
 
 # QUARTERLY TRENDS
 # 1) What are the quarter-over-quarter sales trends in terms of won opportunities and sales volume?
+-- QoQ % change = ((Current quarter − Previous quarter)/Previous quarter) * 100 
+WITH quarter_sales_opportunities AS (
+SELECT QUARTER(close_date) AS quarter,
+		COUNT(*) AS won_opportunities,
+		SUM(close_value) AS sales_revenue
+FROM sales
+WHERE deal_stage = 'Won'
+GROUP BY quarter
+),
+qoq_trends AS (
+SELECT *,
+		LAG(won_opportunities) OVER (ORDER BY quarter ASC) AS prev_won_opportunities,
+        LAG(sales_revenue) OVER (ORDER BY quarter ASC) AS prev_sales_revenue
+FROM quarter_sales_opportunities
+)
+SELECT quarter,
+		won_opportunities,
+		ROUND(((won_opportunities - prev_won_opportunities)/prev_won_opportunities)*100, 2) AS qoq_won_opportunities_growth_pct,
+        sales_revenue,
+        ROUND(((sales_revenue - prev_sales_revenue)/prev_sales_revenue)*100, 2) AS qoq_sales_revenue_growth_pct
+FROM qoq_trends;
+
+
 # 2) How do success rates for sales opportunities vary by quarter?
+-- Success rate % = (Won deals/(Won + Lost deals)) * 100
+-- QoQ % change = ((Current quarter − Previous quarter)/Previous quarter) * 100 
+WITH quarter_won_lost_deals AS (
+SELECT QUARTER(close_date) AS quarter,
+		SUM(CASE WHEN deal_stage = 'Won' THEN 1 ELSE 0 END) AS won_deals,
+        SUM(CASE WHEN deal_stage = 'Lost' THEN 1 ELSE 0 END) AS lost_deals
+FROM sales
+WHERE close_date IS NOT NULL
+GROUP BY quarter
+),
+qoq_success_rate AS (
+SELECT *,
+		(won_deals/(won_deals + lost_deals)) AS success_rate,
+        LAG(won_deals/(won_deals + lost_deals)) OVER (ORDER BY quarter ASC) AS prev_success_rate
+FROM quarter_won_lost_deals
+)
+SELECT quarter,
+		ROUND(success_rate*100, 2) AS success_rate_pct,
+		ROUND(((success_rate - prev_success_rate)/prev_success_rate)*100, 2) AS qoq_success_rate_growth_pct
+FROM qoq_success_rate;
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
