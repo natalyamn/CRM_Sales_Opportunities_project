@@ -1,46 +1,59 @@
 # CRM Sales Opportunities Project
 
-## Dataset Description 
-B2B sales pipeline data from a fictitious company that sells computer hardware, including information on accounts (companies), products, sales teams, and sales opportunities.
+## Description 
+
+This project involves the analysis of B2B sales pipeline data for a fictitious company that specializes in selling computer hardware. The objective is to gain actionable insights into the company's sales operations by examining various aspects of the data, including account activities, product performance, sales team efficiency, and sales opportunities.
+
+The dataset used for this analysis includes comprehensive information on four key areas: accounts (companies), products, sales teams and sales pipeline. 
 
 ## Objectives
 
-* How is each sales team performing compared to the rest?
+The primary goals of this project are to:
 
-* Are any sales agents lagging behind?
+* **Assess Sales Team Performance.** How is each sales team performing in comparison to others? Identifying the top-performing teams and those that may need improvement.
 
-* Can you identify any quarter-over-quarter trends?
+* **Evaluate Sales Agent Productivity.** Are any sales agents significantly lagging behind? Determining which agents are underperforming and may require additional support or training.
 
-* Do any products have better win rates?
+* **Identify Trends.** Can any quarter-over-quarter trends be observed? Understanding patterns in sales performance.
+
+* **Analyze Product Win Rates.** Do any products have better win rates than others? Investigating which products are more successful in closing deals.
 
 ## Project Phases
-### Data Preparation
-* Details on Original Data Files
-* Modifications Done
-### Data Modelling
 
-### Data Analysis
+#### Data Preparation
 
-### Report Creation
+* Details on Original Data Files: This phase involves an examination of the raw data files, including their structure, content, and any initial observations about data quality.
 
-## Data Modelling
+* Transformation: Steps taken to process the data to ensure it is suitable for efficient analysis.
 
-Database Management System (DBMS): MySQL 
+#### Data Modelling
 
-##### Star schema structure
-* Fact table:
-  * sales:
-    * opportunity_id - primary key (PK)
-    * company_id, agent_id, product_id - foreign keys (FK)
-      
-* Dimension tables: many-to-one relationship with the fact table
-  * companies: company_id - PK
-  * sales_teams: agent_id - PK
-  * products: product_id - PK
+* Database and Tables Creation
 
-##### Entity-Relationship Diagram
+* Data Loading
 
-![db_crm_sales_model](https://github.com/user-attachments/assets/190db539-a21c-44bb-bddf-99a1e4c5ddae)
+* Schema Structure
+  
+#### Data Analysis
 
-#### Database and Tables Creation & Data Loading: [db_creation_crm_sales.sql](https://github.com/natalyamn/CRM_Sales_Opportunities_project/blob/main/db_creation_crm_sales.sql)
+* Utilization of SQL queries to explore and address the project's core objectives.
 
+* The analysis focuses on the following key areas:
+
+  * **Sales Team Performance**: Evaluating the effectiveness of each sales team relative to others.
+    
+  * **Identification of Underperforming Sales Agents**: Pinpointing sales agents who are not meeting performance expectations.
+    
+  * **Quarterly Trends**: Identifying and analyzing quarter-over-quarter trends in sales activities and outcomes.
+    
+  * **Product Success Rate**: Assessing which products have the highest win rates.
+    
+  * **Sector Performance**: Analyzing sales performance across different industry sectors to identify high-performing markets.
+    
+  * **Sales Cycle Duration**: Measuring the length of the sales cycle.
+  
+#### Report Creation
+
+* Compiling the findings into a comprehensive report.
+
+* This report will include visualizations, summaries, and actionable recommendations based on the data analysis. 
