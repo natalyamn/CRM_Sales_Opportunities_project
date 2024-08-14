@@ -5,12 +5,13 @@
 In this project, I used a star schema structure to organize the data for efficient querying and analysis.
 
 #### Fact table
+
 * **sales_pipeline**
   
-  * opportunity_id: The primary key (PK) for the fact table, uniquely identifying each sales opportunity.
-  * account_id: A foreign key (FK) linking to the accounts dimension table, identifying the company involved in the sales opportunity.
-  * agent_id: A foreign key (FK) linking to the sales_teams dimension table, identifying the sales agent responsible for the opportunity.
-  * product_id: A foreign key (FK) linking to the products dimension table, identifying the product involved in the sales opportunity.
+  * *opportunity_id*: The primary key (PK) for the fact table, uniquely identifying each sales opportunity.
+  * *account_id*: A foreign key (FK) linking to the accounts dimension table, identifying the company involved in the sales opportunity.
+  * *agent_id*: A foreign key (FK) linking to the sales_teams dimension table, identifying the sales agent responsible for the opportunity.
+  * *product_id*: A foreign key (FK) linking to the products dimension table, identifying the product involved in the sales opportunity.
       
 #### Dimension tables
 
@@ -18,15 +19,15 @@ Each dimension table has a many-to-one relationship with the fact table, meaning
 
 * **accounts**:
 
-  * account_id: The primary key (PK) that uniquely identifies each company.
+  * *account_id*: The primary key (PK) that uniquely identifies each company.
 
 * **sales_teams**:
 
-  * agent_id: The primary key (PK) that uniquely identifies each sales agent or team member.
+  * *agent_id*: The primary key (PK) that uniquely identifies each sales agent or team member.
 
 * **products**:
 
-  * product_id: The primary key (PK) that uniquely identifies each product.
+  * *product_id*: The primary key (PK) that uniquely identifies each product.
 
 ## Database and Tables Creation
 
@@ -42,7 +43,7 @@ SQL script: [**db_creation_crm_sales.sql**](https://github.com/natalyamn/CRM_Sal
 
 Once the tables were created, I proceeded to load the data into the database.
 
-* Data Import: The raw data in CSV format is imported into the MySQL database using SQL commands. During this process, data is mapped to the corresponding columns in the tables.
+* Data Import: The raw data in CSV format (transformed during the Data Preparation phase) is imported into the MySQL database using SQL commands. During this process, data is mapped to the corresponding columns in the tables.
 
 * Data Integrity: Columns with empty string records (identified during the Data Preparation phase) have been converted to NULL values to accurately represent missing data.
   
