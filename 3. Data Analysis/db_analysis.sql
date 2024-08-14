@@ -8,10 +8,10 @@ SELECT st.regional_office AS teams_regional_office,
 		st.manager AS teams_manager,
         COUNT(DISTINCT st.agent_id) AS number_of_salespersons,
         COUNT(*) AS won_opportunities,
-		SUM(s.close_value) AS sales_revenue     
-FROM sales s
-JOIN sales_teams st	ON s.agent_id = st.agent_id
-WHERE s.deal_stage = 'Won'
+		SUM(sp.close_value) AS sales_revenue     
+FROM sales_pipeline sp
+JOIN sales_teams st	ON sp.agent_id = st.agent_id
+WHERE sp.deal_stage = 'Won'
 GROUP BY st.regional_office, st.manager
 ORDER BY sales_revenue DESC;
 
@@ -20,10 +20,10 @@ ORDER BY sales_revenue DESC;
 -- Success rate % = (Won deals/(Won + Lost deals)) * 100
 SELECT st.regional_office AS teams_regional_office,
 		st.manager AS teams_manager,
-        ROUND((	SUM(CASE WHEN s.deal_stage = 'Won' THEN 1 ELSE 0 END) /
-				SUM(CASE WHEN s.deal_stage IN ('Won', 'Lost') THEN 1 ELSE 0 END))*100, 2) AS success_rate_pct
-FROM sales s
-JOIN sales_teams st ON s.agent_id = st.agent_id
+        ROUND((	SUM(CASE WHEN sp.deal_stage = 'Won' THEN 1 ELSE 0 END) /
+				SUM(CASE WHEN sp.deal_stage IN ('Won', 'Lost') THEN 1 ELSE 0 END))*100, 2) AS success_rate_pct
+FROM sales_pipeline sp
+JOIN sales_teams st ON sp.agent_id = st.agent_id
 GROUP BY st.regional_office, st.manager
 ORDER BY success_rate_pct DESC;
 
@@ -36,11 +36,11 @@ WITH ranked_sales_revenue AS (
 SELECT st.regional_office AS teams_regional_office,
 		st.manager AS teams_manager,
         st.sales_agent,
-        SUM(s.close_value) AS sales_revenue,
-        DENSE_RANK() OVER (PARTITION BY st.regional_office, st.manager ORDER BY SUM(s.close_value) ASC) AS sales_rank
-FROM sales s
-JOIN sales_teams st ON s.agent_id = st.agent_id
-WHERE s.deal_stage = 'Won'
+        SUM(sp.close_value) AS sales_revenue,
+        DENSE_RANK() OVER (PARTITION BY st.regional_office, st.manager ORDER BY SUM(sp.close_value) ASC) AS sales_rank
+FROM sales_pipeline sp
+JOIN sales_teams st ON sp.agent_id = st.agent_id
+WHERE sp.deal_stage = 'Won'
 GROUP BY st.regional_office, st.manager, st.sales_agent
 )
 SELECT teams_regional_office,
@@ -57,9 +57,9 @@ SELECT st.regional_office AS teams_regional_office,
         st.sales_agent,
         COUNT(*) AS won_opp,
         DENSE_RANK() OVER (PARTITION BY st.regional_office, st.manager ORDER BY COUNT(*) ASC) AS opp_rank
-FROM sales s
-JOIN sales_teams st ON s.agent_id = st.agent_id
-WHERE s.deal_stage = 'Won'
+FROM sales_pipeline sp
+JOIN sales_teams st ON sp.agent_id = st.agent_id
+WHERE sp.deal_stage = 'Won'
 GROUP BY st.regional_office, st.manager, st.sales_agent
 )
 SELECT teams_regional_office,
@@ -74,10 +74,10 @@ WITH sales_deals AS (
 SELECT st.regional_office AS teams_regional_office,
 		st.manager AS teams_manager,
         st.sales_agent,
-        SUM(CASE WHEN s.deal_stage = 'Won' THEN 1 ELSE 0 END) AS won_deals,
-        SUM(CASE WHEN s.deal_stage IN ('Won', 'Lost') THEN 1 ELSE 0 END) AS won_lost_deals        
-FROM sales s
-JOIN sales_teams st ON s.agent_id = st.agent_id
+        SUM(CASE WHEN sp.deal_stage = 'Won' THEN 1 ELSE 0 END) AS won_deals,
+        SUM(CASE WHEN sp.deal_stage IN ('Won', 'Lost') THEN 1 ELSE 0 END) AS won_lost_deals        
+FROM sales_pipeline sp
+JOIN sales_teams st ON sp.agent_id = st.agent_id
 GROUP BY st.regional_office, st.manager, st.sales_agent
 ),
 success_rates AS (
@@ -104,7 +104,7 @@ ORDER BY teams_regional_office, teams_manager, sales_agent;
 -- Closing Dates information: 
 SELECT MIN(close_date) AS first_close_date, 
 		MAX(close_date) AS last_close_date
-FROM sales;
+FROM sales_pipeline;
 
 # 1) What are the quarter-over-quarter sales trends in terms of won opportunities and sales volume?
 -- QoQ % change = ((Current quarter − Previous quarter)/Previous quarter) * 100 
@@ -112,7 +112,7 @@ WITH quarter_sales_opportunities AS (
 SELECT QUARTER(close_date) AS quarter,
 		COUNT(*) AS won_opportunities,
 		SUM(close_value) AS sales_revenue
-FROM sales
+FROM sales_pipeline
 WHERE deal_stage = 'Won'
 GROUP BY quarter
 ),
@@ -134,7 +134,7 @@ WITH quarter_sales_deals AS (
 SELECT QUARTER(close_date) AS quarter,
 		SUM(CASE WHEN deal_stage = 'Won' THEN 1 ELSE 0 END) AS won_deals,
         SUM(CASE WHEN deal_stage IN ('Won', 'Lost') THEN 1 ELSE 0 END) AS won_lost_deals
-FROM sales
+FROM sales_pipeline
 WHERE close_date IS NOT NULL
 GROUP BY quarter
 ),
@@ -154,20 +154,20 @@ FROM qoq_success_rate;
 # PRODUCT SUCCESS RATE
 # 1) Which products have the highest success rates in closing deals?
 SELECT p.product_name,
-		ROUND((	SUM(CASE WHEN s.deal_stage = 'Won' THEN 1 ELSE 0 END) /
-				SUM(CASE WHEN s.deal_stage IN ('Won','Lost') THEN 1 ELSE 0 END))*100, 2) AS success_rate_pct
-FROM sales s
-JOIN products p ON s.product_id = p.product_id
+		ROUND((	SUM(CASE WHEN sp.deal_stage = 'Won' THEN 1 ELSE 0 END) /
+				SUM(CASE WHEN sp.deal_stage IN ('Won','Lost') THEN 1 ELSE 0 END))*100, 2) AS success_rate_pct
+FROM sales_pipeline sp
+JOIN products p ON sp.product_id = p.product_id
 GROUP BY p.product_name
 ORDER BY success_rate_pct DESC;
 
 # 2) Which products generate the most revenue, and how do they compare to other products?
 WITH products_revenue AS (
 SELECT p.product_name,
-		SUM(s.close_value) AS sales_revenue
-FROM sales s
-JOIN products p ON s.product_id = p.product_id
-WHERE s.deal_stage = 'Won'
+		SUM(sp.close_value) AS sales_revenue
+FROM sales_pipeline sp
+JOIN products p ON sp.product_id = p.product_id
+WHERE sp.deal_stage = 'Won'
 GROUP BY p.product_name
 )
 SELECT product_name,
@@ -179,21 +179,21 @@ ORDER BY sales_revenue DESC;
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # SECTOR PERFORMANCE
--- NOTE: A total of 1088 'Engaging' deals and 337 'Prospecting' deals are excluded from the sector performance analysis due to the lack of an assigned company.
+-- NOTE: A total of 1088 'Engaging' deals and 337 'Prospecting' deals are excluded from the sector performance analysis due to the lack of an assigned account.
 -- Unassigned Deals:
 SELECT SUM(CASE WHEN deal_stage = 'Engaging' THEN 1 ELSE 0 END) AS unassigned_engaging_deals,
 		SUM(CASE WHEN deal_stage = 'Prospecting' THEN 1 ELSE 0 END) AS unassigned_prospecting_deals
-FROM sales 
-WHERE company_id IS NULL;
+FROM sales_pipeline
+WHERE account_id IS NULL;
 
 # 1) Which sectors generate the most revenue and have the highest success rates?
-SELECT c.sector,
-		SUM(CASE WHEN s.deal_stage = 'Won' THEN s.close_value ELSE 0 END) AS sales_revenue,
-		ROUND((	SUM(CASE WHEN s.deal_stage = 'Won' THEN 1 ELSE 0 END) /
-				SUM(CASE WHEN s.deal_stage IN ('Won','Lost') THEN 1 ELSE 0 END))*100, 2) AS success_rate_pct
-FROM sales s
-JOIN companies c ON s.company_id = c.company_id
-GROUP BY c.sector
+SELECT a.sector,
+		SUM(CASE WHEN sp.deal_stage = 'Won' THEN sp.close_value ELSE 0 END) AS sales_revenue,
+		ROUND((	SUM(CASE WHEN sp.deal_stage = 'Won' THEN 1 ELSE 0 END) /
+				SUM(CASE WHEN sp.deal_stage IN ('Won','Lost') THEN 1 ELSE 0 END))*100, 2) AS success_rate_pct
+FROM sales_pipeline sp
+JOIN accounts a ON sp.account_id = a.account_id
+GROUP BY a.sector
 ORDER BY sales_revenue DESC, success_rate_pct DESC;
 
 
@@ -201,15 +201,15 @@ ORDER BY sales_revenue DESC, success_rate_pct DESC;
 -- Win rate % = (Won deals / Total deals) * 100
 -- Win-Loss ratio = Won deals / Lost deals
 WITH sector_opportunities AS (
-SELECT c.sector,
-		SUM(CASE WHEN s.deal_stage = 'Won' THEN 1 ELSE 0 END) AS won_opportunities,
-        SUM(CASE WHEN s.deal_stage = 'Lost' THEN 1 ELSE 0 END) AS lost_opportunities,
-		SUM(CASE WHEN s.deal_stage = 'Engaging' THEN 1 ELSE 0 END) AS engaging_opportunities,
-        SUM(CASE WHEN s.deal_stage = 'Prospecting' THEN 1 ELSE 0 END) AS prospecting_opportunities,
+SELECT a.sector,
+		SUM(CASE WHEN sp.deal_stage = 'Won' THEN 1 ELSE 0 END) AS won_opportunities,
+        SUM(CASE WHEN sp.deal_stage = 'Lost' THEN 1 ELSE 0 END) AS lost_opportunities,
+		SUM(CASE WHEN sp.deal_stage = 'Engaging' THEN 1 ELSE 0 END) AS engaging_opportunities,
+        SUM(CASE WHEN sp.deal_stage = 'Prospecting' THEN 1 ELSE 0 END) AS prospecting_opportunities,
         COUNT(*) AS total_opportunities
-FROM sales s
-JOIN companies c ON s.company_id = c.company_id
-GROUP BY c.sector
+FROM sales_pipeline sp
+JOIN accounts a ON sp.account_id = a.account_id
+GROUP BY a.sector
 )
 SELECT sector,
 		won_opportunities,
@@ -231,25 +231,25 @@ SELECT deal_stage,
 		ROUND(AVG(DATEDIFF(close_date, engage_date))) AS avg_sales_cycle_days,
         MAX(DATEDIFF(close_date, engage_date)) AS max_sales_cycle_days,
         MIN(DATEDIFF(close_date, engage_date)) AS min_sales_cycle_days
-FROM sales
+FROM sales_pipeline
 WHERE deal_stage IN ('Won', 'Lost')
 GROUP BY deal_stage;
 
 # 2) How does the sales cycle duration vary by product or sector?
 -- Sales cycle duration by product
 SELECT p.product_name,
-		ROUND(AVG(CASE WHEN s.deal_stage = 'Won' THEN DATEDIFF(s.close_date, s.engage_date) END)) AS avg_won_sales_cycle_days,
-		ROUND(AVG(CASE WHEN s.deal_stage = 'Lost' THEN DATEDIFF(s.close_date, s.engage_date) END)) AS avg_lost_sales_cycle_days
-FROM sales s
-JOIN products p ON s.product_id = p.product_id
+		ROUND(AVG(CASE WHEN sp.deal_stage = 'Won' THEN DATEDIFF(sp.close_date, sp.engage_date) END)) AS avg_won_sales_cycle_days,
+		ROUND(AVG(CASE WHEN sp.deal_stage = 'Lost' THEN DATEDIFF(sp.close_date, sp.engage_date) END)) AS avg_lost_sales_cycle_days
+FROM sales_pipeline sp
+JOIN products p ON sp.product_id = p.product_id
 GROUP BY p.product_name
 ORDER BY avg_won_sales_cycle_days ASC, avg_lost_sales_cycle_days ASC;
 
 -- Sales cycle duration by sector
-SELECT c.sector,
-		ROUND(AVG(CASE WHEN s.deal_stage = 'Won' THEN DATEDIFF(s.close_date, s.engage_date) END)) AS avg_won_sales_cycle_days,
-		ROUND(AVG(CASE WHEN s.deal_stage = 'Lost' THEN DATEDIFF(s.close_date, s.engage_date) END)) AS avg_lost_sales_cycle_days
-FROM sales s
-JOIN companies c ON s.company_id = c.company_id
-GROUP BY c.sector
+SELECT a.sector,
+		ROUND(AVG(CASE WHEN sp.deal_stage = 'Won' THEN DATEDIFF(sp.close_date, sp.engage_date) END)) AS avg_won_sales_cycle_days,
+		ROUND(AVG(CASE WHEN sp.deal_stage = 'Lost' THEN DATEDIFF(sp.close_date, sp.engage_date) END)) AS avg_lost_sales_cycle_days
+FROM sales_pipeline sp
+JOIN accounts a ON sp.account_id = a.account_id
+GROUP BY a.sector
 ORDER BY avg_won_sales_cycle_days ASC, avg_lost_sales_cycle_days ASC;
