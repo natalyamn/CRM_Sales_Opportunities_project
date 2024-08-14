@@ -18,10 +18,10 @@ CREATE TABLE IF NOT EXISTS products (
     sales_price INT NOT NULL
 );
 
--- dimension table creation: companies
-CREATE TABLE IF NOT EXISTS companies (
-	company_id INT PRIMARY KEY,
-    company_name VARCHAR(255) NOT NULL,
+-- dimension table creation: accounts
+CREATE TABLE IF NOT EXISTS accounts (
+	account_id INT PRIMARY KEY,
+    account_name VARCHAR(255) NOT NULL,
     sector VARCHAR(100) NOT NULL,
     year_established YEAR,
     revenue FLOAT,
@@ -30,19 +30,19 @@ CREATE TABLE IF NOT EXISTS companies (
     subsidiary_of VARCHAR(255)
 );
 
--- fact table creation: sales 
-CREATE TABLE IF NOT EXISTS sales (
+-- fact table creation: sales_pipeline 
+CREATE TABLE IF NOT EXISTS sales_pipeline (
 	opportunity_id VARCHAR(8) PRIMARY KEY,
     agent_id INT,
     product_id INT,
-    company_id INT,
+    account_id INT,
     deal_stage VARCHAR(50),
     engage_date DATE,
     close_date DATE,
     close_value FLOAT,
     FOREIGN KEY (agent_id) REFERENCES sales_teams(agent_id),
 	FOREIGN KEY (product_id) REFERENCES products(product_id),
-	FOREIGN KEY (company_id) REFERENCES companies(company_id)
+	FOREIGN KEY (account_id) REFERENCES accounts(account_id)
 );
 
 ---------------------------------------------------------------------------------------------------
@@ -67,29 +67,29 @@ IGNORE 1 LINES;
 
 SELECT * FROM products LIMIT 5;
 
--- loading data into the companies table - file: accounts.csv
+-- loading data into the accounts table - file: accounts.csv
 LOAD DATA INFILE "C:\\DataFiles\\CRM_sales\\CSV files\\modified_files\\accounts.csv"
-INTO TABLE companies
+INTO TABLE accounts
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
 IGNORE 1 LINES
-(company_id, company_name, sector, year_established, revenue, employees, office_location, @subsidiary_of)
+(account_id, account_name, sector, year_established, revenue, employees, office_location, @subsidiary_of)
 SET subsidiary_of = NULLIF(@subsidiary_of,'');
 
-SELECT * FROM companies LIMIT 5;
+SELECT * FROM accounts LIMIT 5;
 
--- loading data into the sales table - file: sales_pipeline.csv
+-- loading data into the sales_pipeline table - file: sales_pipeline.csv
 LOAD DATA INFILE "C:\\DataFiles\\CRM_sales\\CSV files\\modified_files\\sales_pipeline.csv"
-INTO TABLE sales
+INTO TABLE sales_pipeline
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
 IGNORE 1 LINES
-(opportunity_id, agent_id, product_id, @company_id, deal_stage, @engage_date, @close_date, @close_value)
-SET company_id = NULLIF(@company_id, ''),
+(opportunity_id, agent_id, product_id, @account_id, deal_stage, @engage_date, @close_date, @close_value)
+SET account_id = NULLIF(@account_id, ''),
 	engage_date = NULLIF(@engage_date, ''),
     close_date = NULLIF(@close_date, ''),
     close_value = NULLIF(@close_value, '');
 
-SELECT * FROM sales LIMIT 5;
+SELECT * FROM sales_pipeline LIMIT 5;
