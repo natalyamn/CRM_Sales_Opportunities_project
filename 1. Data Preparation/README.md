@@ -2,7 +2,7 @@
 
 ## Data Examination
 
-The initial phase of the project involves an examination of the [**original data files**](https://github.com/natalyamn/CRM_Sales_Opportunities_project/tree/main/1.%20Data%20Preparation/original_files), which are provided in CSV format. Below is a summary of the fields contained in each CSV file:
+In the initial phase of the project, I examined the [**original data files**](https://github.com/natalyamn/CRM_Sales_Opportunities_project/tree/main/1.%20Data%20Preparation/original_files), which were provided in CSV format. Below is a summary of the fields contained in each CSV file: 
 
 * `accounts.csv`: Contains information about the companies (accounts) involved in sales opportunities.
   * *account*: Company name
@@ -35,34 +35,26 @@ The initial phase of the project involves an examination of the [**original data
 
 In the `sales_pipeline.csv` file, the columns *sales_agent*, *product*, and *account* originally contained full names that correspond to entries in the `sales_teams.csv`, `products.csv`, and `accounts.csv` files. 
 
-To enhance efficiency, I added integer ID columns in the `sales_teams.csv`, `products.csv`, and `accounts.csv` files and replaced the full names in `sales_pipeline.csv` with these IDs. I made this modification to enhance the performance of database operations, especially during joins, and to ensure consistency and accuracy across the dataset.
+To enhance efficiency, I added integer ID columns in the `sales_teams.csv`, `products.csv`, and `accounts.csv` files and replaced the full names in `sales_pipeline.csv` with these IDs. I made this modification to enhance the performance of database operations, particularly during joins, and to ensure consistency and accuracy across the dataset.
 
 ## Data Transformation
 
 To prepare the data for efficient analysis, I took the following transformation steps:
 
-1. Add ID column to the `products.csv`, `accounts.csv`, and `sales_teams.csv` files.
-   * Each entry now has a unique identifier (ID) that corresponds to a specific product, account, or sales team.
-   * This ID will be used as a reference in the `sales_pipeline.csv` file.
+1. **Add ID columns:** I added unique identifier (ID) columns to the `products.csv`, `accounts.csv`, and `sales_teams.csv` files. These IDs are now referenced in the `sales_pipeline.csv` file to standardize the data and make querying more efficient.
 
-2. Create a dictionary to map IDs to full names for `products.csv`, `accounts.csv`, and `sales_teams.csv` files.
-   * These dictionaries serve as reference tables, ensuring that each ID correctly corresponds to the appropriate name in the data.
+2. **Create mapping dictionaries:** I created dictionaries to map IDs to full names for the `products.csv`, `accounts.csv`, and `sales_teams.csv` files. These dictionaries serve as lookup tables, ensuring that each ID corresponds correctly to the appropriate name in the data.
 
-3. Validate data consistency. 
-   * The dictionaries were cross-referenced with the `sales_pipeline.csv` file to check for any discrepancies, such as names in `sales_pipeline.csv` that do not match those in the dictionaries.
-   * This step is crucial for maintaining data integrity and ensuring that all relationships are correctly represented.
+3. **Validate data consistency:** I cross-referenced the dictionaries with the `sales_pipeline.csv` file to identify any discrepancies, such as names in `sales_pipeline.csv` that did not match those in the dictionaries. This validation step was crucial for maintaining data integrity.
 
-4. Correct misspelled values. 
-   * Any misspelled values in the dictionaries were corrected to ensure consistency across all files.
-   * This step helps prevent potential errors during data replacement, which could lead to incorrect insights in future analysis if mismatched values were treated as null.
+4. **Correct misspelled values:** I corrected any misspelled values in the dictionaries to ensure consistency across all files. This helped prevent potential errors during data replacement that could have led to incorrect insights in future analyses.
 
-5. Replace full names in the `sales_pipeline.csv` file with the corresponding sales agents, products, and accounts IDs. 
-   * This transformation standardizes the data and facilitates efficient querying.
+5. **Replace full names with IDs:** I replaced the full names in the `sales_pipeline.csv` file with the corresponding IDs for sales agents, products, and accounts, standardizing the data for optimal querying.
 
-6. Save the updated data in the `sales_pipeline.csv` file
-    * This final step ensures that the data is properly prepared and optimized for the next project phases.
-  
-Additionally, columns that contained empty string values were identified:
+6. **Save the updated data:** Finally, I saved the updated data in the `sales_pipeline.csv` file, ensuring it was properly prepared and optimized for the next phases of the project.
+
+
+Additionally, I identified columns that contained empty string values:
 
 * `accounts.csv`: *subsidiary_of*.
 
@@ -70,10 +62,10 @@ Additionally, columns that contained empty string values were identified:
 
 #### Data Transformation Tools and Outputs
 
-The data transformation process was automated using a Python script, which is available in the following Jupyter Notebook:
+I automated the data transformation process using a Python script, which is available in the following Jupyter Notebook:
 
-* [**csv_files_preparation.ipynb**](https://github.com/natalyamn/CRM_Sales_Opportunities_project/blob/main/1.%20Data%20Preparation/csv_files_preparation.ipynb)
+* [**csv files preparation**](https://github.com/natalyamn/CRM_Sales_Opportunities_project/blob/main/1.%20Data%20Preparation/csv_files_preparation.ipynb)
 
 The transformed data files resulting from this process can be found in the following directory:
 
-* [**modified_files folder**](https://github.com/natalyamn/CRM_Sales_Opportunities_project/tree/main/1.%20Data%20Preparation/modified_files)
+* [**modified data files**](https://github.com/natalyamn/CRM_Sales_Opportunities_project/tree/main/1.%20Data%20Preparation/modified_files)
