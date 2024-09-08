@@ -31,23 +31,23 @@ Each dimension table has a many-to-one relationship with the fact table, meaning
 
 ## Database and Tables Creation
 
-I designed and implemented the database in MySQL, where each table (fact and dimension) is created based on the schema defined above. The creation process involves:
+I designed and implemented the database in MySQL, where I created each table (fact and dimension) based on the schema defined above. The creation process involved:
 
-* Defining the tables: Using SQL scripts to create the sales_pipeline, accounts, sales_teams, and products tables with the appropriate data types and constraints (e.g., primary keys, foreign keys, NOT NULL).
-  
-* Establishing relationships: Setting up the foreign key constraints to enforce referential integrity between the fact and dimension tables.
+* Defining the tables: I used SQL scripts to create the sales_pipeline, accounts, sales_teams, and products tables, specifying the appropriate data types and constraints (e.g., primary keys, foreign keys, NOT NULL).
 
-SQL script: [**db_creation_crm_sales.sql**](https://github.com/natalyamn/CRM_Sales_Opportunities_project/blob/main/2.%20Data%20Modelling/db_creation_crm_sales.sql)
+* Establishing relationships: I set up foreign key constraints to enforce referential integrity between the fact and dimension tables.
+
+The SQL script I used for this process is available here: [**db_creation_crm_sales.sql**](https://github.com/natalyamn/CRM_Sales_Opportunities_project/blob/main/2.%20Data%20Modelling/db_creation_crm_sales.sql)
 
 ## Data Loading 
 
 Once the tables were created, I proceeded to load the data into the database.
 
-* Data Import: The raw data in CSV format (transformed during the Data Preparation phase) is imported into the MySQL database using SQL commands. During this process, data is mapped to the corresponding columns in the tables.
+* Data Import: I imported the raw data (transformed during the Data Preparation phase) into the MySQL database using SQL commands. During this process, I ensured the data was correctly mapped to the corresponding columns in the tables.
 
-* Data Integrity: Columns with empty string records (identified during the Data Preparation phase) have been converted to NULL values to accurately represent missing data.
-  
-SQL script: [**db_creation_crm_sales.sql**](https://github.com/natalyamn/CRM_Sales_Opportunities_project/blob/main/2.%20Data%20Modelling/db_creation_crm_sales.sql)
+* Data Integrity: For columns with empty string records (identified during the Data Preparation phase), I converted those to NULL values to accurately represent missing data.
+
+The SQL script for data loading can also be found here: [**db_creation_crm_sales.sql**](https://github.com/natalyamn/CRM_Sales_Opportunities_project/blob/main/2.%20Data%20Modelling/db_creation_crm_sales.sql)
 
 ## Entity-Relationship Diagram
 
