@@ -6,7 +6,6 @@ USE crm_sales;
 # 1) What is the sales volume and the number of won opportunities for each sales team?
 SELECT st.regional_office AS teams_regional_office,
 		st.manager AS teams_manager,
-        COUNT(DISTINCT st.agent_id) AS number_of_salespersons,
         COUNT(*) AS won_opportunities,
 		SUM(sp.close_value) AS sales_revenue     
 FROM sales_pipeline sp
@@ -31,13 +30,34 @@ ORDER BY success_rate_pct DESC;
 
 # IDENTIFICATION OF UNDERPERFORMING SALES AGENTS 
 # 1) Which sales agents have the lowest performance in terms of sales volume and won opportunities?
--- Lowest performing sales agents in terms of sales volume:
-WITH ranked_sales_revenue AS (
+-- Check if there are any sales agents without assigned deals:
+SELECT st.regional_office,
+        st.manager,
+        st.sales_agent
+FROM sales_teams st 
+WHERE NOT EXISTS (SELECT 1 FROM sales_pipeline sp WHERE sp.agent_id = st.agent_id);
+
+-- Sales agents performance ranking:
+SELECT st.sales_agent,
+		SUM(sp.close_value) AS sales_revenue,
+        DENSE_RANK () OVER (ORDER BY SUM(sp.close_value) DESC) AS revenue_rank,
+        COUNT(*) AS won_opportunities,
+        RANK () OVER (ORDER BY COUNT(*) DESC) AS won_opportunities_rank
+FROM sales_pipeline sp
+JOIN sales_teams st ON sp.agent_id = st.agent_id
+WHERE sp.deal_stage = 'Won'
+GROUP BY st.sales_agent
+ORDER BY sales_revenue ASC, won_opportunities ASC;
+
+-- Lowest performing sales agent of each team:
+WITH ranked_sales_agents AS (
 SELECT st.regional_office AS teams_regional_office,
 		st.manager AS teams_manager,
         st.sales_agent,
         SUM(sp.close_value) AS sales_revenue,
-        DENSE_RANK() OVER (PARTITION BY st.regional_office, st.manager ORDER BY SUM(sp.close_value) ASC) AS sales_rank
+        DENSE_RANK() OVER (PARTITION BY st.regional_office, st.manager ORDER BY SUM(sp.close_value) ASC) AS sales_rank_asc,
+        COUNT(*) AS won_opportunities,
+		DENSE_RANK() OVER (PARTITION BY st.regional_office, st.manager ORDER BY COUNT(*) ASC) AS opp_rank_asc
 FROM sales_pipeline sp
 JOIN sales_teams st ON sp.agent_id = st.agent_id
 WHERE sp.deal_stage = 'Won'
@@ -45,31 +65,16 @@ GROUP BY st.regional_office, st.manager, st.sales_agent
 )
 SELECT teams_regional_office,
 		teams_manager,
-        sales_agent AS lowest_sales_revenue_agent,
-        sales_revenue
-FROM ranked_sales_revenue
-WHERE sales_rank = 1;
+        sales_agent,
+        sales_revenue,
+        CASE WHEN sales_rank_asc = 1 THEN 'Yes' ELSE 'No' END AS 'lowest sales performance?',
+        won_opportunities,
+        CASE WHEN opp_rank_asc = 1 THEN 'Yes' ELSE 'No' END AS 'lowest opportunities performance?'
+FROM ranked_sales_agents
+WHERE sales_rank_asc = 1 OR opp_rank_asc = 1
+ORDER BY teams_regional_office, teams_manager, sales_revenue;
 
--- Lowest performing sales agents in terms of won opportunities:
-WITH ranked_won_opp AS (
-SELECT st.regional_office AS teams_regional_office,
-		st.manager AS teams_manager,
-        st.sales_agent,
-        COUNT(*) AS won_opp,
-        DENSE_RANK() OVER (PARTITION BY st.regional_office, st.manager ORDER BY COUNT(*) ASC) AS opp_rank
-FROM sales_pipeline sp
-JOIN sales_teams st ON sp.agent_id = st.agent_id
-WHERE sp.deal_stage = 'Won'
-GROUP BY st.regional_office, st.manager, st.sales_agent
-)
-SELECT teams_regional_office,
-		teams_manager,
-        sales_agent AS lowest_won_opportunities_agent,
-        won_opp AS won_opportunities
-FROM ranked_won_opp
-WHERE opp_rank = 1;
-
-# 2) What is the individual success rate of each sales agent, and how does it compare to the team average?
+# 2) What is the individual success rate of each sales agent, and how does it compare to the team success rate?
 WITH sales_deals AS (
 SELECT st.regional_office AS teams_regional_office,
 		st.manager AS teams_manager,
@@ -180,7 +185,7 @@ ORDER BY sales_revenue DESC;
 
 # SECTOR PERFORMANCE
 -- NOTE: A total of 1088 'Engaging' deals and 337 'Prospecting' deals are excluded from the sector performance analysis due to the lack of an assigned account.
--- Unassigned Deals:
+-- Unassigned deals:
 SELECT SUM(CASE WHEN deal_stage = 'Engaging' THEN 1 ELSE 0 END) AS unassigned_engaging_deals,
 		SUM(CASE WHEN deal_stage = 'Prospecting' THEN 1 ELSE 0 END) AS unassigned_prospecting_deals
 FROM sales_pipeline
@@ -200,26 +205,18 @@ ORDER BY sales_revenue DESC, success_rate_pct DESC;
 # 2) What is the distribution of opportunities by sector?
 -- Win rate % = (Won deals / Total deals) * 100
 -- Win-Loss ratio = Won deals / Lost deals
-WITH sector_opportunities AS (
 SELECT a.sector,
-		SUM(CASE WHEN sp.deal_stage = 'Won' THEN 1 ELSE 0 END) AS won_opportunities,
-        SUM(CASE WHEN sp.deal_stage = 'Lost' THEN 1 ELSE 0 END) AS lost_opportunities,
-		SUM(CASE WHEN sp.deal_stage = 'Engaging' THEN 1 ELSE 0 END) AS engaging_opportunities,
-        SUM(CASE WHEN sp.deal_stage = 'Prospecting' THEN 1 ELSE 0 END) AS prospecting_opportunities,
-        COUNT(*) AS total_opportunities
+		SUM(CASE WHEN sp.deal_stage = 'Won' THEN 1 ELSE 0 END) AS won,
+        SUM(CASE WHEN sp.deal_stage = 'Lost' THEN 1 ELSE 0 END) AS lost,
+        SUM(CASE WHEN sp.deal_stage = 'Engaging' THEN 1 ELSE 0 END) AS engaging,
+        SUM(CASE WHEN sp.deal_stage = 'Prospecting' THEN 1 ELSE 0 END) AS prospecting,
+        COUNT(*) AS total,
+		ROUND((SUM(CASE WHEN sp.deal_stage = 'Won' THEN 1 ELSE 0 END)/COUNT(*))*100, 2) AS win_rate_pct,
+        ROUND(SUM(CASE WHEN sp.deal_stage = 'Won' THEN 1 ELSE 0 END)/SUM(CASE WHEN sp.deal_stage = 'Lost' THEN 1 ELSE 0 END), 2) AS win_loss_ratio
 FROM sales_pipeline sp
 JOIN accounts a ON sp.account_id = a.account_id
 GROUP BY a.sector
-)
-SELECT sector,
-		won_opportunities,
-        lost_opportunities,
-        engaging_opportunities,
-        prospecting_opportunities,
-		ROUND((won_opportunities/total_opportunities)*100, 2) AS win_rate_pct,
-        ROUND(won_opportunities/lost_opportunities, 2) AS win_loss_ratio
-FROM sector_opportunities
-ORDER BY won_opportunities DESC;
+ORDER BY won DESC;
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
