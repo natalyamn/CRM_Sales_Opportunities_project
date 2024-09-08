@@ -2,13 +2,13 @@
 
 ## Description 
 
-This project involves the analysis of B2B sales pipeline data for a fictitious company that specializes in selling computer hardware. The objective is to gain actionable insights into the company's sales operations by examining various aspects of the data, including account activities, product performance, sales team efficiency, and sales opportunities.
+This project involves the analysis of B2B sales pipeline data for a fictitious company that specializes in selling computer hardware. The objective is to gain actionable insights into the company's sales operations by examining various aspects of the data, including sales opportunities, product performance, account activities, and sales team efficiency.
 
-The dataset used for this analysis includes comprehensive information on four key areas: accounts (companies), products, sales teams and sales pipeline. 
+**Data Source:** Maven Analytics.
 
 ## Objectives
 
-The primary goals of this project are to:
+The main goals of this project are to:
 
 * **Assess Sales Team Performance.** How is each sales team performing in comparison to others? Identifying the top-performing teams and those that may need improvement.
 
@@ -16,44 +16,46 @@ The primary goals of this project are to:
 
 * **Identify Trends.** Can any quarter-over-quarter trends be observed? Understanding patterns in sales performance.
 
-* **Analyze Product Win Rates.** Do any products have better win rates than others? Investigating which products are more successful in closing deals.
+* **Analyze Product Success Rates.** Do any products have better win rates than others? Investigating which products are more successful in closing deals.
+
+A personal objective of this project was to strengthen my ability to write more complex SQL queries using Common Table Expressions (CTEs) and Window Functions. Additionally, I aimed to deepen my skills in creating advanced DAX measures and building dynamic dashboards in Power BI.
 
 ## Project Phases
 
-#### Data Preparation
+### [Data Preparation](https://github.com/natalyamn/CRM_Sales_Opportunities_project/tree/main/1.%20Data%20Preparation)
 
-* Details on Original Data Files: This phase involves an examination of the raw data files, including their structure, content, and any initial observations about data quality.
+* **Data Examination:** Review of raw data files, including data structure, contents, and any initial observations.
 
-* Transformation: Steps taken to process the data to ensure it is suitable for efficient analysis.
+* **Data Transformation:** Processing the data to ensure it's ready for efficient analysis.
 
-#### Data Modelling
+### [Data Modelling](https://github.com/natalyamn/CRM_Sales_Opportunities_project/tree/main/2.%20Data%20Modelling)
 
-* Database and Tables Creation
-
-* Data Loading
-
-* Schema Structure
+* **Schema Structure:** Defining relationships and structure of the data.
   
-#### Data Analysis
+* **Database and Tables Creation:** Setting up tables in a SQL database for analysis.
 
-* Utilization of SQL queries to explore and address the project's core objectives.
-
-* The analysis focuses on the following key areas:
-
-  * **Sales Team Performance**: Evaluating the effectiveness of each sales team relative to others.
-    
-  * **Identification of Underperforming Sales Agents**: Pinpointing sales agents who are not meeting performance expectations.
-    
-  * **Quarterly Trends**: Identifying and analyzing quarter-over-quarter trends in sales activities and outcomes.
-    
-  * **Product Success Rate**: Assessing which products have the highest win rates.
-    
-  * **Sector Performance**: Analyzing sales performance across different industry sectors to identify high-performing markets.
-    
-  * **Sales Cycle Duration**: Measuring the length of the sales cycle.
+* **Data Loading:** Loading the prepared data into the database.
   
-#### Report Creation
+### [Data Analysis](https://github.com/natalyamn/CRM_Sales_Opportunities_project/tree/main/3.%20Data%20Analysis)
 
-* Compiling the findings into a comprehensive report.
+* **SQL Querying:** Use of SQL queries to explore and address the project's core objectives.
 
-* This report will include visualizations, summaries, and actionable recommendations based on the data analysis. 
+* **Key Focus Areas:**
+
+  * Sales Team Performance
+    
+  * Underperforming Sales Agents
+    
+  * Quarterly Trends
+    
+  * Product Success Rates
+    
+  * Sector Performance
+    
+  * Sales Cycle Duration
+  
+### [Report Creation](https://github.com/natalyamn/CRM_Sales_Opportunities_project/tree/main/4.%20Report%20Creation) 
+
+* **Insights Presentation:** Use Power BI to build a comprehensive report.
+ 
+* **Actionable Insights:** Summarizing key findings and providing data-driven recommendations.
