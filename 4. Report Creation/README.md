@@ -6,6 +6,8 @@ Each page of the report is designed to provide actionable insights into differen
 
 **Link to the Interactive Power BI Report:** [**Report**](https://app.powerbi.com/view?r=eyJrIjoiNGJlYTc2MTYtYzJiNy00ZmY2LWIyMzktN2Y0N2NiZGUwY2IyIiwidCI6IjAxMjJmNmU1LTFkMDAtNDU4Zi1hMjNlLWI4YTk4YmJhMDczZCIsImMiOjl9) 
 
+*Disclaimer: The units displayed in this report may vary depending on the regional settings of your browser. This report was designed with the EN-US region in mind. Please adjust your regional settings if necessary to match the units used in this report.*
+
 Below is a summary of the key elements on each page and their relevance:
 
 ### Overview
