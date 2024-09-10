@@ -22,13 +22,13 @@ A personal objective of this project was to strengthen my ability to write more 
 
 ## Project Phases
 
-### [Data Preparation](https://github.com/natalyamn/CRM_Sales_Opportunities_project/tree/main/1.%20Data%20Preparation)
+#### [Data Preparation](https://github.com/natalyamn/CRM_Sales_Opportunities_project/tree/main/1.%20Data%20Preparation)
 
 * **Data Examination:** Review of raw data files, including data structure, contents, and any initial observations.
 
 * **Data Transformation:** Processing the data to ensure it's ready for efficient analysis.
 
-### [Data Modelling](https://github.com/natalyamn/CRM_Sales_Opportunities_project/tree/main/2.%20Data%20Modelling)
+#### [Data Modelling](https://github.com/natalyamn/CRM_Sales_Opportunities_project/tree/main/2.%20Data%20Modelling)
 
 * **Schema Structure:** Defining relationships and structure of the data.
   
@@ -36,26 +36,26 @@ A personal objective of this project was to strengthen my ability to write more 
 
 * **Data Loading:** Loading the prepared data into the database.
   
-### [Data Analysis](https://github.com/natalyamn/CRM_Sales_Opportunities_project/tree/main/3.%20Data%20Analysis)
+#### [Data Analysis](https://github.com/natalyamn/CRM_Sales_Opportunities_project/tree/main/3.%20Data%20Analysis)
 
 * **SQL Querying:** Use of SQL queries to explore and address the project's core objectives.
 
 * **Key Focus Areas:**
-
-  * Sales Team Performance
-    
+  * Sales Team Performance    
   * Underperforming Sales Agents
-    
   * Quarterly Trends
-    
-  * Product Success Rates
-    
+  * Product Success Rates  
   * Sector Performance
-    
   * Sales Cycle Duration
   
-### [Report Creation](https://github.com/natalyamn/CRM_Sales_Opportunities_project/tree/main/4.%20Report%20Creation) 
+#### [Report Creation](https://github.com/natalyamn/CRM_Sales_Opportunities_project/tree/main/4.%20Report%20Creation) 
 
-* **Insights Presentation:** Use Power BI to build a comprehensive report.
+* **Insights Presentation:** Use of Power BI to build a comprehensive report.
  
+**Link to the Interactive Power BI Report:** [**Report**](https://app.powerbi.com/view?r=eyJrIjoiNGJlYTc2MTYtYzJiNy00ZmY2LWIyMzktN2Y0N2NiZGUwY2IyIiwidCI6IjAxMjJmNmU1LTFkMDAtNDU4Zi1hMjNlLWI4YTk4YmJhMDczZCIsImMiOjl9) 
+
+*Disclaimer: The units displayed in this report may vary depending on the regional settings of your browser. This report was designed with the US region in mind. Please adjust your regional settings if necessary to match the units used in this report.*
+
+![image](https://github.com/user-attachments/assets/41b9bc3e-a4f8-44c6-8813-aefe4dcedb40)
+
 * **Actionable Insights:** Summarizing key findings and providing data-driven recommendations.
